@@ -2,28 +2,23 @@ import type { BaseStorage, StorageConfig, ValueOrUpdate } from './types.js';
 import { SessionAccessLevelEnum, StorageEnum } from './enums.js';
 
 /**
- * Chrome reference error while running `processTailwindFeatures` in tailwindcss.
- *  To avoid this, we need to check if the globalThis.chrome is available and add fallback logic.
+ * Safely access the chrome object, with fallback if unavailable.
  */
-const chrome = globalThis.chrome;
+const chrome = globalThis.chrome && globalThis.chrome.storage ? globalThis.chrome : null;
 
 /**
  * Sets or updates an arbitrary cache with a new value or the result of an update function.
  */
 const updateCache = async <D>(valueOrUpdate: ValueOrUpdate<D>, cache: D | null): Promise<D> => {
-  // Type guard to check if our value or update is a function
   const isFunction = <D>(value: ValueOrUpdate<D>): value is (prev: D) => D | Promise<D> => {
     return typeof value === 'function';
   };
 
-  // Type guard to check in case of a function, if its a Promise
   const returnsPromise = <D>(func: (prev: D) => D | Promise<D>): func is (prev: D) => Promise<D> => {
-    // Use ReturnType to infer the return type of the function and check if it's a Promise
     return (func as (prev: D) => Promise<D>) instanceof Promise;
   };
 
   if (isFunction(valueOrUpdate)) {
-    // Check if the function returns a Promise
     if (returnsPromise(valueOrUpdate)) {
       return valueOrUpdate(cache as D);
     } else {
@@ -43,14 +38,16 @@ let globalSessionAccessLevelFlag: StorageConfig['sessionAccessForContentScripts'
 /**
  * Checks if the storage permission is granted in the manifest.json.
  */
-function checkStoragePermission(storageEnum: StorageEnum): void {
-  if (!chrome) {
-    return;
+function checkStoragePermission(storageEnum: StorageEnum): boolean {
+  if (!chrome || !chrome.storage) {
+    console.warn('Chrome storage API is not available in this context.');
+    return false;
   }
 
-  if (chrome.storage[storageEnum] === undefined) {
+  if (!chrome.storage[storageEnum]) {
     throw new Error(`Check your storage permission in manifest.json: ${storageEnum} is not defined`);
   }
+  return true;
 }
 
 /**
@@ -67,30 +64,33 @@ export function createStorage<D = string>(key: string, fallback: D, config?: Sto
   const serialize = config?.serialization?.serialize ?? ((v: D) => v);
   const deserialize = config?.serialization?.deserialize ?? (v => v as D);
 
-  // Set global session storage access level for StoryType.Session, only when not already done but needed.
+  // Set global session storage access level for StorageEnum.Session, only when not already done but needed.
   if (
     globalSessionAccessLevelFlag === false &&
     storageEnum === StorageEnum.Session &&
     config?.sessionAccessForContentScripts === true
   ) {
-    checkStoragePermission(storageEnum);
-    chrome?.storage[storageEnum]
-      .setAccessLevel({
-        accessLevel: SessionAccessLevelEnum.ExtensionPagesAndContentScripts,
-      })
-      .catch(error => {
-        console.warn(error);
-        console.warn('Please call setAccessLevel into different context, like a background script.');
-      });
-    globalSessionAccessLevelFlag = true;
+    if (checkStoragePermission(storageEnum)) {
+      chrome?.storage[storageEnum]
+        .setAccessLevel({
+          accessLevel: SessionAccessLevelEnum.ExtensionPagesAndContentScripts,
+        })
+        .catch(error => {
+          console.warn(error);
+          console.warn('Please call setAccessLevel in a different context, like a background script.');
+        });
+      globalSessionAccessLevelFlag = true;
+    }
   }
 
   // Register life cycle methods
   const get = async (): Promise<D> => {
-    checkStoragePermission(storageEnum);
-    const value = await chrome?.storage[storageEnum].get([key]);
+    if (!checkStoragePermission(storageEnum)) {
+      return fallback;
+    }
+    const value = await chrome!.storage[storageEnum].get([key]);
 
-    if (!value) {
+    if (!value || value[key] === undefined) {
       return fallback;
     }
 
@@ -102,18 +102,23 @@ export function createStorage<D = string>(key: string, fallback: D, config?: Sto
   };
 
   const set = async (valueOrUpdate: ValueOrUpdate<D>) => {
+    if (!checkStoragePermission(storageEnum)) {
+      cache = await updateCache(valueOrUpdate, cache);
+      _emitChange();
+      return;
+    }
+
     if (!initedCache) {
       cache = await get();
     }
     cache = await updateCache(valueOrUpdate, cache);
 
-    await chrome?.storage[storageEnum].set({ [key]: serialize(cache) });
+    await chrome!.storage[storageEnum].set({ [key]: serialize(cache) });
     _emitChange();
   };
 
   const subscribe = (listener: () => void) => {
     listeners = [...listeners, listener];
-
     return () => {
       listeners = listeners.filter(l => l !== listener);
     };
@@ -123,6 +128,7 @@ export function createStorage<D = string>(key: string, fallback: D, config?: Sto
     return cache;
   };
 
+  // Initialize cache
   get().then(data => {
     cache = data;
     initedCache = true;
@@ -131,7 +137,6 @@ export function createStorage<D = string>(key: string, fallback: D, config?: Sto
 
   // Listener for live updates from the browser
   async function _updateFromStorageOnChanged(changes: { [key: string]: chrome.storage.StorageChange }) {
-    // Check if the key we are listening for is in the changes object
     if (changes[key] === undefined) return;
 
     const valueOrUpdate: ValueOrUpdate<D> = deserialize(changes[key].newValue);
@@ -139,13 +144,12 @@ export function createStorage<D = string>(key: string, fallback: D, config?: Sto
     if (cache === valueOrUpdate) return;
 
     cache = await updateCache(valueOrUpdate, cache);
-
     _emitChange();
   }
 
   // Register listener for live updates for our storage area
-  if (liveUpdate) {
-    chrome?.storage[storageEnum].onChanged.addListener(_updateFromStorageOnChanged);
+  if (liveUpdate && checkStoragePermission(storageEnum)) {
+    chrome!.storage[storageEnum].onChanged.addListener(_updateFromStorageOnChanged);
   }
 
   return {
