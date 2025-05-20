@@ -1,0 +1,17 @@
+{
+  "name": "@extension/backend",
+  "version": "0.0.1",
+  "description": "chrome extension - backend",
+  "scripts": {
+    "dev": "convex dev",
+    "setup": "convex dev --until-success"
+  },
+  "dependencies": {
+    "@auth/core": "0.37.0",
+    "@convex-dev/auth": "^0.0.86",
+    "convex": "^1.13.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
