@@ -91,6 +91,13 @@ const NavMenu = (props: any) => (
           <Link to="/explore">Explore</Link>
         </NavigationMenuLink>
       </NavigationMenuItem>
+      <Authenticated>
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild>
+            <Link to="/my-bookmarks">My Bookmarks</Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+      </Authenticated>
     </NavigationMenuList>
   </NavigationMenu>
 );
