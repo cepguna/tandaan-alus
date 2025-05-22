@@ -1,9 +1,13 @@
 import { createRoot } from 'react-dom/client';
-import { ConvexReactClient, ConvexProvider } from 'convex/react';
+import { ConvexReactClient } from 'convex/react';
 import { ConvexAuthProvider } from '@convex-dev/auth/react';
 import '@src/index.css';
 import { CONVEX_URL } from '@extension/env';
-import Popup from '@src/Popup';
+import App from '@src/App';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { Toaster } from './components/base';
+import { ModalAlertProvider } from './contexts/ModalAlertContext';
 
 const convex = new ConvexReactClient(CONVEX_URL as string);
 
@@ -16,7 +20,14 @@ function init() {
 
   root.render(
     <ConvexAuthProvider client={convex}>
-      <Popup />
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <Router>
+          <ModalAlertProvider>
+            <App />
+          </ModalAlertProvider>
+        </Router>
+        <Toaster duration={6000} />
+      </ThemeProvider>
     </ConvexAuthProvider>,
   );
 }
