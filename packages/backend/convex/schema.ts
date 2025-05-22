@@ -4,16 +4,15 @@ import { authTables } from '@convex-dev/auth/server';
 
 export default defineSchema({
   ...authTables,
-  notes: defineTable({
-    title: v.string(),
-    content: v.string(),
-    summary: v.optional(v.string()),
-  }),
   sites: defineTable({
     title: v.string(),
     description: v.optional(v.string()),
     link: v.string(),
-    isPrivate: v.boolean(),
+  }).index('by_link', ['link']),
+  siteUsers: defineTable({
     userId: v.id('users'),
-  }),
+    siteId: v.id('sites'),
+    isPrivate: v.boolean(),
+    tags: v.optional(v.array(v.string())),
+  }).index('by_userId_siteId', ['userId', 'siteId']),
 });
