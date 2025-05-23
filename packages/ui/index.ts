@@ -15,3 +15,4 @@ export * from './lib/components/ui/select';
 export * from './lib/components/ui/textarea';
 export * from './lib/components/ui/radio-group';
 export * from './lib/components/ui/label';
+export * from './lib/components/ui/dropdown-menu';
