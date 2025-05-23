@@ -31,7 +31,7 @@ code {
 
 @layer components {
   .custom-container {
-    @apply max-w-screen-xl mx-auto;
+    @apply max-w-screen-xl mx-auto 2xl:px-0 px-4;
   }
 }
 

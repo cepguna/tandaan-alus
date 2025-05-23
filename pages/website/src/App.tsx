@@ -1,19 +1,45 @@
-import { Routes, Route } from 'react-router-dom';
-import { withErrorBoundary, withSuspense } from '@extension/shared';
-import Landing from './pages/landing';
-import Explore from './pages/explore';
-import Profile from './pages/profile';
-import MyBookmarks from './pages/my-bookmarks';
+import { ConvexReactClient } from 'convex/react';
+import { ConvexAuthProvider } from '@convex-dev/auth/react';
+import '@src/index.css';
+import { CONVEX_URL } from '@extension/env';
+import { RouterProvider } from 'react-router-dom';
+import { ConvexQueryClient } from '@convex-dev/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from './contexts/theme-context';
+import { AuthProvider } from './contexts/auth-context';
+import { ModalAlertProvider } from './contexts/modal-alert-context';
+import { Toaster } from './components/ui/sonner';
+import RootRouter from './routes/root';
+import { HelmetProvider } from 'react-helmet-async';
 
-function App() {
+const convex = new ConvexReactClient(CONVEX_URL as string);
+
+const convexQueryClient = new ConvexQueryClient(convex);
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryKeyHashFn: convexQueryClient.hashFn(),
+      queryFn: convexQueryClient.queryFn(),
+    },
+  },
+});
+convexQueryClient.connect(queryClient);
+
+export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/explore" element={<Explore />} />
-      <Route path="/my-bookmarks" element={<MyBookmarks />} />
-      <Route path="/profile" element={<Profile />} />
-    </Routes>
+    <ConvexAuthProvider client={convex}>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+            <AuthProvider>
+              <ModalAlertProvider>
+                <RouterProvider router={RootRouter} />
+              </ModalAlertProvider>
+            </AuthProvider>
+            <Toaster duration={6000} />
+          </ThemeProvider>
+        </HelmetProvider>
+      </QueryClientProvider>
+    </ConvexAuthProvider>
   );
 }
-
-export default withErrorBoundary(withSuspense(App, <div> Loading ... </div>), <div> Error Occur </div>);

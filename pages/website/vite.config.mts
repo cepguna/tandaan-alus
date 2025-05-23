@@ -15,6 +15,7 @@ export default withPageConfig({
   },
   publicDir: resolve(rootDir, 'public'),
   build: {
-    outDir: resolve(rootDir, '..', '..', 'dist', 'popup'),
+    // outDir: resolve(rootDir, '..', '..', 'dist', 'website'),
+    outDir: resolve(rootDir, 'dist', 'website'),
   },
 });
