@@ -2,6 +2,7 @@ import { useAuthActions } from '@convex-dev/auth/react';
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@extension/backend/convex/_generated/api';
+import { Badge } from '@extension/ui';
 
 export const User = () => {
   const { signOut } = useAuthActions();
@@ -9,23 +10,25 @@ export const User = () => {
   const addSite = useMutation(api.sites.addSites);
   const checkSiteByLink = useMutation(api.sites.checkSitesByLink);
   const [isBlacklist, setIsBlackList] = useState(true);
+  const [isPrivate, setIsPrivate] = useState(false);
   // Handle bookmark action
-  const handleBookmark = useCallback(async () => {
+  const handleBookmark = async () => {
     setIsLoading(true);
     try {
       const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
-      await addSite({
+      const dataAdd = {
         link: tab.url ?? '',
         title: tab.title ?? '',
-        isPrivate: false,
-      });
+        isPrivate: isPrivate,
+      };
+      await addSite(dataAdd);
       setIsSiteChecked(true);
     } catch {
       setError('Failed to bookmark site');
     } finally {
       setIsLoading(false);
     }
-  }, [addSite]);
+  };
 
   const [isSiteChecked, setIsSiteChecked] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,6 +64,20 @@ export const User = () => {
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        <Badge
+          className="cursor-pointer"
+          onClick={() => setIsPrivate(true)}
+          variant={isPrivate ? 'default' : 'outline'}>
+          Private EEE
+        </Badge>
+        <Badge
+          className="cursor-pointer"
+          onClick={() => setIsPrivate(false)}
+          variant={!isPrivate ? 'default' : 'outline'}>
+          Public
+        </Badge>
+      </div>
       <div className="text-center">
         <p className="">{user?.email ?? 'No email'}</p>
       </div>
