@@ -1,17 +1,16 @@
-import { api } from '@extension/backend/convex/_generated/api';
 import { Footer } from '@src/components/Footer';
 import { Navbar } from '@src/components/Navbar';
 import { UserBookmarkSites } from '@src/components/elements';
-import { useQuery } from 'convex/react';
+import { useGetAllMySites } from '@src/hooks/useServices/useSites';
 
 const MyBookmarks = () => {
-  const sites = useQuery(api.sites.getAllMySites);
+  const { isPending, data: sites } = useGetAllMySites();
   return (
     <>
       <Navbar />
       <div style={{ height: 130 }} />
       <div className="custom-container space-y-16">
-        <UserBookmarkSites sites={sites ?? []} />
+        <UserBookmarkSites isLoading={isPending} sites={sites ?? []} />
       </div>
       <div style={{ height: 150 }} />
       <Footer />

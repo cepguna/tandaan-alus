@@ -22,12 +22,14 @@
   "dependencies": {
     "@auth/core": "0.37.0",
     "@convex-dev/auth": "^0.0.86",
+    "@convex-dev/react-query": "0.0.0-alpha.8",
     "@extension/backend": "workspace:*",
+    "@extension/env": "workspace:*",
     "@extension/i18n": "workspace:*",
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
     "@extension/ui": "workspace:*",
-    "@extension/env": "workspace:*",
+    "@tanstack/react-query": "^5.76.2",
     "convex": "^1.13.0"
   },
   "devDependencies": {

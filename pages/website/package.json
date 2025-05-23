@@ -22,6 +22,7 @@
   "dependencies": {
     "@auth/core": "0.37.0",
     "@convex-dev/auth": "^0.0.86",
+    "@convex-dev/react-query": "0.0.0-alpha.8",
     "@extension/backend": "workspace:*",
     "@extension/env": "workspace:*",
     "@extension/i18n": "workspace:*",
@@ -34,6 +35,7 @@
     "@fontsource-variable/plus-jakarta-sans": "^5.2.5",
     "@fontsource-variable/raleway": "^5.2.5",
     "@hookform/resolvers": "^5.0.1",
+    "@tanstack/react-query": "^5.76.2",
     "convex": "^1.13.0",
     "lucide-react": "^0.511.0",
     "react-hook-form": "^7.56.4",
