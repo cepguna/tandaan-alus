@@ -7,6 +7,7 @@
     "setup": "convex dev --until-success"
   },
   "dependencies": {
+    "@extension/env": "workspace:*",
     "@auth/core": "0.37.0",
     "@convex-dev/auth": "^0.0.86",
     "convex": "^1.13.0"
