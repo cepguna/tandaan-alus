@@ -6,7 +6,7 @@ import type { ILayout } from '@src/types';
 
 export const PUBLIC_ROUTES: ILayout[] = [
   {
-    title: 'Login',
+    title: 'Landing Page',
     exact: true,
     breadcrumbs: [],
     path: URL.HOME,

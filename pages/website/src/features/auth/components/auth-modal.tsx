@@ -1,16 +1,7 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  Tabs,
-  TabsList,
-  TabsContent,
-  TabsTrigger,
-} from '@extension/ui';
-import { SignInForm } from './signin-form';
-import { SignUpForm } from './signup-form';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@extension/ui';
+import { LoginForm } from './login-form';
+import { useState } from 'react';
+import { OtpForm } from './otp-form';
 
 type Props = {
   isOpen: boolean;
@@ -18,29 +9,38 @@ type Props = {
 };
 
 export function ModalAuthentication({ isOpen, onClose }: Props) {
+  const [showOtp, setShowOtp] = useState(false);
+  const [email, setEmail] = useState('');
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <Tabs defaultValue="sign-in" className="">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sign-in">Sign In</TabsTrigger>
-            <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
-          </TabsList>
-          <TabsContent value="sign-in">
-            <DialogHeader className="mt-8 mb-4">
-              <DialogTitle>Sign In</DialogTitle>
-              <DialogDescription>Sign in to your existing account</DialogDescription>
-            </DialogHeader>
-            <SignInForm onClose={onClose} />
-          </TabsContent>
-          <TabsContent value="sign-up">
-            <DialogHeader className="mt-8 mb-4">
-              <DialogTitle>Sign Up</DialogTitle>
-              <DialogDescription>Create new account and join with other people in the world</DialogDescription>
-            </DialogHeader>
-            <SignUpForm onClose={onClose} />
-          </TabsContent>
-        </Tabs>
+      <DialogContent
+        onInteractOutside={e => {
+          e.preventDefault();
+        }}>
+        <DialogHeader>
+          <DialogTitle>{showOtp ? 'Verification Email' : 'Log In or Create an Account'}</DialogTitle>
+          <DialogDescription>
+            {showOtp ? `We have sent 8 digit code to ${email}` : 'Log In to existing account or create a new one'}
+          </DialogDescription>
+        </DialogHeader>
+        {showOtp ? (
+          <OtpForm
+            email={email}
+            onSuccess={() => {
+              onClose();
+              setShowOtp(false);
+              setEmail('');
+            }}
+          />
+        ) : (
+          <LoginForm
+            onClose={onClose}
+            showOtp={email => {
+              setEmail(email);
+              setShowOtp(true);
+            }}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

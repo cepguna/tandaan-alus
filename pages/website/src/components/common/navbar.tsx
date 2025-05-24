@@ -49,11 +49,8 @@ export const Navbar = () => {
           <div className="flex items-center gap-3">
             <ThemeSwitcher />
             <Unauthenticated>
-              <Button onClick={onOpen} variant="outline" className="hidden sm:inline-flex rounded-full">
-                Sign In
-              </Button>
               <Button onClick={onOpen} className="rounded-full">
-                Sign Up
+                Log In
               </Button>
             </Unauthenticated>
             <Authenticated>

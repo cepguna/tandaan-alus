@@ -1,3 +1,2 @@
 export * from './auth-modal';
-export * from './signin-form';
-export * from './signup-form';
+export * from './login-form';

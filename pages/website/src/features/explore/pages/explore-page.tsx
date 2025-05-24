@@ -4,8 +4,10 @@ import { TopContributionUser } from '@src/components/common/top-contribution-use
 const ExplorePage = () => {
   return (
     <div>
-      <MostBookmarkedSite />
-      <TopContributionUser />
+      <div className="space-y-10">
+        <MostBookmarkedSite />
+        <TopContributionUser />
+      </div>
     </div>
   );
 };

@@ -38,6 +38,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@tanstack/react-query": "^5.76.2",
     "convex": "^1.13.0",
+    "input-otp": "^1.4.2",
     "lucide-react": "^0.511.0",
     "react-error-boundary": "^6.0.0",
     "react-helmet-async": "^2.0.5",
