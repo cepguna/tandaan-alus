@@ -23,3 +23,5 @@ export * from './lib/components/ui/tooltip';
 export * from './lib/components/ui/skeleton';
 export * from './lib/components/ui/alert';
 export * from './lib/components/ui/breadcrumb';
+export * from './lib/components/ui/command';
+export * from './lib/components/ui/popover';
