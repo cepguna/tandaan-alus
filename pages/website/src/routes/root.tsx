@@ -18,12 +18,7 @@ const RootRouter = createBrowserRouter(
           key={item.path}>
           <Route
             element={
-              <AppRoute
-                key={item.path}
-                path={item.path}
-                isPrivate={item.isPrivate}
-                title={item.title}
-                breadcrumbs={item.breadcrumbs}>
+              <AppRoute key={item.path} path={item.path} isPrivate={item.isPrivate} title={item.title}>
                 <item.component />
               </AppRoute>
             }

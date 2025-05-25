@@ -68,7 +68,9 @@ export const Navbar = () => {
           <div className="flex md:hidden items-center gap-3">
             <ThemeSwitcher />
             <Authenticated>
-              <UserMenu />
+              <div className="sm:block hidden">
+                <UserMenu />
+              </div>
             </Authenticated>
             <NavigationSheet />
           </div>
@@ -92,6 +94,13 @@ const UserMenu = () => {
       labelYes: 'Logout',
       labelClose: 'Cancel',
       onSubmit: async () => {
+        window.postMessage(
+          {
+            type: 'SYNC_LOCALSTORAGE',
+            payload: {}, // Empty payload = clear signal
+          },
+          '*',
+        );
         await signOut();
         navigate(URL.HOME);
         closeModalAlert();
@@ -168,6 +177,9 @@ const NavMenu = (props: any) => (
             <Link to={URL.PROFILE}>Profile</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
+        <div className="sm:hidden block">
+          <UserMenu />
+        </div>
       </Authenticated>
     </NavigationMenuList>
   </NavigationMenu>

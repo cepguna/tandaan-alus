@@ -7,9 +7,9 @@ export const MostBookmarkedSite = () => {
   if (isPending) {
     return (
       <div>
-        <h2 className="text-2xl font-bold mb-4">Most Bookmarked Sites</h2>
-        <div className="grid grid-cols-3 gap-4">
-          {new Array(9).fill('').map((_, i) => (
+        <h2 className="text-2xl font-bold mb-6">Most Bookmarked Sites</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {new Array(8).fill('').map((_, i) => (
             <BookmarkSiteCard isLoading key={i} />
           ))}
         </div>
@@ -18,9 +18,9 @@ export const MostBookmarkedSite = () => {
   }
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Most Bookmarked Sites</h2>
+      <h2 className="text-2xl font-bold mb-6">Most Bookmarked Sites</h2>
       {sites && sites.length > 0 ? (
-        <div className="columns-1 sm:columns-2 xl:columns-2 gap-4 space-y-4">
+        <div className="columns-1 sm:columns-2 gap-4 space-y-4">
           {sites.map(data => (
             <BookmarkSiteCard
               data={data as Doc<'sites'>}

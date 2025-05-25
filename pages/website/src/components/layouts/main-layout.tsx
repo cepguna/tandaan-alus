@@ -17,12 +17,12 @@ export const MainLayout = () => {
   return (
     <>
       <Navbar />
-      <div style={{ height: 130 }} />
-      <div className="custom-container px-4">
+      <div style={{ height: 120 }} />
+      <div className="custom-container min-h-screen px-4">
         <Breadcrumbs />
         <Outlet />
       </div>
-      <div style={{ height: 180 }} />
+      <div style={{ height: 100 }} />
       <Footer />
     </>
   );
@@ -33,14 +33,14 @@ export function Breadcrumbs() {
   if (items.length === 0) return null;
 
   return (
-    <Breadcrumb className="mb-4">
+    <Breadcrumb className="mb-6">
       <BreadcrumbList>
         {items.map((item, index) => (
           <Fragment key={item.title}>
             {index !== items.length - 1 && (
               <BreadcrumbItem className="">
                 <Link to={item.path}>
-                  <BreadcrumbLink>{item.title}</BreadcrumbLink>
+                  <BreadcrumbLink className="capitalize">{item.title}</BreadcrumbLink>
                 </Link>
               </BreadcrumbItem>
             )}

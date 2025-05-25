@@ -7,7 +7,6 @@ export const PRIVATE_ROUTES: ILayout[] = [
   {
     title: 'Dashboard',
     exact: true,
-    breadcrumbs: [],
     path: URL.DASHBOARD,
     component: DashboardPage,
     layout: 'main',
@@ -15,7 +14,6 @@ export const PRIVATE_ROUTES: ILayout[] = [
   {
     title: 'Profile',
     exact: true,
-    breadcrumbs: [],
     path: URL.PROFILE,
     component: ProfilePage,
     layout: 'main',

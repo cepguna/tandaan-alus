@@ -8,7 +8,7 @@ const Profile = () => {
   const { data } = useGetMe();
   const location = useLocation();
   return (
-    <div className="custom-container  min-h-screen">
+    <div className="min-h-screen">
       <div className="flex justify-between gap-2 flex-wrap">
         <div className="space-y-0.5">
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
@@ -17,9 +17,7 @@ const Profile = () => {
             {location.hash === '#appearance' && 'Appearance'}
           </h1>
           <p className="text-muted-foreground">
-            {!location.hash || location.hash === '#profile'
-              ? 'Manage your account settings and set e-mail preferences.'
-              : null}
+            {!location.hash || location.hash === '#profile' ? 'Manage your account settings.' : null}
             {location.hash === '#account' && 'Update your account settings. Set your preferred language and timezone.'}
             {location.hash === '#appearance' &&
               'Customize the appearance of the app. Automatically switch between day and night themes.'}

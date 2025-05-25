@@ -7,7 +7,6 @@ export const PUBLIC_ROUTES: ILayout[] = [
   {
     title: 'Landing Page',
     exact: true,
-    breadcrumbs: [],
     path: URL.HOME,
     component: LandingPage,
     layout: 'none',
@@ -15,7 +14,6 @@ export const PUBLIC_ROUTES: ILayout[] = [
   {
     title: 'Explore',
     exact: true,
-    breadcrumbs: [],
     path: URL.EXPLORE,
     component: ExplorePage,
     layout: 'main',
@@ -23,7 +21,6 @@ export const PUBLIC_ROUTES: ILayout[] = [
   {
     title: 'Detail Explore',
     exact: true,
-    breadcrumbs: [],
     path: URL.DETAIL_EXPLORE,
     component: DetailExplorePage,
     layout: 'main',

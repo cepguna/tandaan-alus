@@ -3,12 +3,8 @@ import { useLocation, useMatches } from 'react-router-dom';
 
 const removeSlug = (param: string, search: string) => {
   switch (param) {
-    case 'idProduct':
-      return search.includes('productChannel') ? 'Detail Product Channel' : 'Detail Product';
-    case 'expensesId':
-      return 'Detail Expenses';
-    case 'noteId':
-      return 'Detail Note';
+    case 'userId':
+      return 'List Bookmarks By User';
     default:
       return param.split('-').join(' ');
   }

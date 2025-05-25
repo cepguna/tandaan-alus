@@ -1,5 +1,7 @@
 import { Button } from '@extension/ui';
 import { Link } from 'react-router-dom';
+import { Authenticated, Unauthenticated } from 'convex/react';
+import { URL } from '@src/lib/constants';
 
 export const HeroSection = () => {
   return (
@@ -44,7 +46,14 @@ export const HeroSection = () => {
           </div>
           {/* Buttons */}
           <div className="mt-8 flex justify-center gap-3">
-            <Button size="lg">Start Bookmarking</Button>
+            <Authenticated>
+              <Link to={URL.DASHBOARD}>
+                <Button size="lg">Go to Dashboard</Button>
+              </Link>
+            </Authenticated>
+            <Unauthenticated>
+              <Button size="lg">Start Bookmarking</Button>
+            </Unauthenticated>
             <Link to="/explore">
               <Button size="lg" variant="outline">
                 Explore Bookmarks

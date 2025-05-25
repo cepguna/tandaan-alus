@@ -23,6 +23,11 @@ export const useGetPublicSitesByUserId = (userId: Id<'users'>) => {
   return result;
 };
 
+export const useGetPublicSitesByUsername = (username: string) => {
+  const result = useQuery(convexQuery(api.sites.getPublicSitesByUsername, { username }));
+  return result;
+};
+
 export const useGetSitesByLink = (link: string) => {
   const result = useQuery(
     convexQuery(api.sites.getSitesByLink, {

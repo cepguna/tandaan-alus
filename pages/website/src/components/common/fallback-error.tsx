@@ -39,17 +39,11 @@ function FallbackError({ title, desc, redirectBack }: TFallbackError) {
   }, [redirectBack]);
   return (
     <div className="w-full flex flex-col justify-center items-center h-[590px]">
-      <h1 className="text-center">{title ?? 'Terjadi Kesalahan pada Halaman Ini!'}</h1>
-      <small>
-        {desc ?? (
-          <>
-            Silahkan menghubungi <i>help desk</i>
-          </>
-        )}
-      </small>
+      <h1 className="text-center text-4xl font-bold">{title ?? 'There Was an Error on This Page!'}</h1>
+      <small>{desc ?? <>Nooooooooooooooooooooooooooooooo the website crash</>}</small>
       {redirectBack && (
         <Button className="mt-4" onClick={handleRedirect}>
-          <ArrowLeft name="arrow-left" className="mr-2" size={20} /> {redirectBack.title ?? 'Kembali'}
+          <ArrowLeft name="arrow-left" className="mr-2" size={20} /> {redirectBack.title ?? 'Back to Home'}
         </Button>
       )}
     </div>
