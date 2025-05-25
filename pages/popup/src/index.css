@@ -22,15 +22,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@layer base {
-  :root {
-    --font-jakarta: 'Plus Jakarta Sans Variable', sans-serif;
-    --font-inter: 'Inter Variable', sans-serif;
-    --font-outfit: 'Outfit Variable', sans-serif;
-    --font-raleway: 'Raleway Variable', sans-serif;
-    --font-josefin: 'Josefin Sans Variable', sans-serif;
-  }
-}
 
 body {
   width: 300px;

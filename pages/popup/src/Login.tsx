@@ -43,7 +43,7 @@ export const Login = () => {
 
   // Toggle sign in/up
   const toggleFlow = () => {
-    setFormData(prev => ({ ...prev, flow: prev.flow === 'sign  signIn' ? 'signUp' : 'signIn' }));
+    setFormData(prev => ({ ...prev, flow: prev.flow === 'signIn' ? 'signUp' : 'signIn' }));
   };
 
   // Check site when user changes
