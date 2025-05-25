@@ -26,7 +26,7 @@ import { Authenticated, Unauthenticated } from 'convex/react';
 import { LogOut, Menu, Palette, User } from 'lucide-react';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useModalAlert } from '@src/contexts/modal-alert-context';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Logo } from './logo';
 import { ModalAuthentication } from '@src/features/auth/components';
 import { URL } from '@src/lib/constants';
@@ -39,9 +39,16 @@ export const Navbar = () => {
     <>
       <nav className="fixed top-6 z-50 inset-x-4 h-16 bg-background border dark:border-slate-700/70 max-w-screen-xl mx-auto rounded-full">
         <div className="h-full flex items-center justify-between mx-auto px-4">
-          <Link to={'/'}>
-            <Logo />
-          </Link>
+          <Authenticated>
+            <Link to={URL.DASHBOARD}>
+              <Logo />
+            </Link>
+          </Authenticated>
+          <Unauthenticated>
+            <Link to={URL.HOME}>
+              <Logo />
+            </Link>
+          </Unauthenticated>
 
           {/* Desktop Menu */}
           <NavMenu className="hidden md:block" />
@@ -73,6 +80,7 @@ export const Navbar = () => {
 };
 
 const UserMenu = () => {
+  const navigate = useNavigate();
   const { data } = useGetMe();
   const { signOut } = useAuthActions();
   const { openModalAlert, closeModalAlert } = useModalAlert();
@@ -85,6 +93,7 @@ const UserMenu = () => {
       labelClose: 'Cancel',
       onSubmit: async () => {
         await signOut();
+        navigate(URL.HOME);
         closeModalAlert();
       },
     });
@@ -133,11 +142,20 @@ const UserMenu = () => {
 const NavMenu = (props: any) => (
   <NavigationMenu {...props}>
     <NavigationMenuList className="gap-6 space-x-0 data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start">
-      <NavigationMenuItem className={location.pathname === '/' ? 'font-semibold' : ''}>
-        <NavigationMenuLink asChild>
-          <Link to={URL.HOME}>Home</Link>
-        </NavigationMenuLink>
-      </NavigationMenuItem>
+      <Authenticated>
+        <NavigationMenuItem className={location.pathname.includes('dashboard') ? 'font-semibold' : ''}>
+          <NavigationMenuLink asChild>
+            <Link to={URL.DASHBOARD}>Home</Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+      </Authenticated>
+      <Unauthenticated>
+        <NavigationMenuItem className={location.pathname === '/' ? 'font-semibold' : ''}>
+          <NavigationMenuLink asChild>
+            <Link to={URL.HOME}>Home</Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+      </Unauthenticated>
       <NavigationMenuItem className={location.pathname.includes('explore') ? 'font-semibold' : ''}>
         <NavigationMenuLink asChild>
           <Link to={URL.EXPLORE}>Explore</Link>
@@ -145,9 +163,9 @@ const NavMenu = (props: any) => (
       </NavigationMenuItem>
       <Authenticated>
         <NavigationMenuItem
-          className={location.pathname.includes(URL.BOOKMARKS.replaceAll('/', '')) ? 'font-semibold' : ''}>
+          className={location.pathname.includes(URL.PROFILE.replaceAll('/', '')) ? 'font-semibold' : ''}>
           <NavigationMenuLink asChild>
-            <Link to={URL.BOOKMARKS}>My Bookmarks</Link>
+            <Link to={URL.PROFILE}>Profile</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </Authenticated>

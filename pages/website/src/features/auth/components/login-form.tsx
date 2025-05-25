@@ -7,6 +7,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, cn, But
 import { useAuthActions } from '@convex-dev/auth/react';
 import { toast } from 'sonner';
 import { Github } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { URL } from '@src/lib/constants';
 
 type UserAuthFormProps = HTMLAttributes<HTMLFormElement> & {
   onClose: () => void;
@@ -19,6 +21,7 @@ const formSchema = z.object({
 
 export function LoginForm({ className, onClose, showOtp, ...props }: UserAuthFormProps) {
   const { signIn } = useAuthActions();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -38,6 +41,7 @@ export function LoginForm({ className, onClose, showOtp, ...props }: UserAuthFor
       if (res.signingIn) {
         toast.success(`Welcome to Tandaan Alus`);
         onClose();
+        navigate(URL.DASHBOARD);
       } else {
         showOtp(data.email);
       }

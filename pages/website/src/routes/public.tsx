@@ -1,6 +1,5 @@
 import { DetailExplorePage, ExplorePage } from '@src/features/explore';
 import { LandingPage } from '@src/features/landing';
-import { ProfilePage } from '@src/features/profile';
 import { URL } from '@src/lib/constants';
 import type { ILayout } from '@src/types';
 
@@ -27,14 +26,6 @@ export const PUBLIC_ROUTES: ILayout[] = [
     breadcrumbs: [],
     path: URL.DETAIL_EXPLORE,
     component: DetailExplorePage,
-    layout: 'main',
-  },
-  {
-    title: 'Profile',
-    exact: true,
-    breadcrumbs: [],
-    path: URL.PROFILE,
-    component: ProfilePage,
     layout: 'main',
   },
 ];

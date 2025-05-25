@@ -18,6 +18,8 @@ import {
 import { useAuthActions } from '@convex-dev/auth/react';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { URL } from '@src/lib/constants';
 
 const FormSchema = z.object({
   code: z.string().min(8, {
@@ -32,6 +34,7 @@ type Props = {
 
 export function OtpForm({ email, onSuccess }: Props) {
   const { signIn } = useAuthActions();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -43,13 +46,11 @@ export function OtpForm({ email, onSuccess }: Props) {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
     setIsLoading(true);
-
-    console.log(data);
     try {
-      const res = await signIn('resend-otp', { code: data.code, email, flow: 'signIn' });
-      console.log('otp response', res);
+      await signIn('resend-otp', { code: data.code, email, flow: 'signIn' });
       onSuccess();
       toast.success(`Welcome to Tandaan Alus`);
+      navigate(URL.DASHBOARD);
     } catch {
       toast.error(`Failed to verify invalid code`);
     } finally {
