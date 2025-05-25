@@ -8,10 +8,18 @@ export default defineSchema({
     name: v.optional(v.string()),
     image: v.optional(v.string()),
     email: v.optional(v.string()),
+    username: v.optional(v.string()),
+    bio: v.optional(v.string()),
     emailVerificationTime: v.optional(v.number()),
-    phone: v.optional(v.string()),
-    phoneVerificationTime: v.optional(v.number()),
-    isAnonymous: v.optional(v.boolean()),
+    isPrivate: v.optional(v.boolean()),
+    urls: v.optional(
+      v.array(
+        v.object({
+          type: v.string(),
+          link: v.string(),
+        }),
+      ),
+    ),
     // other "users" fields...
   }).index('email', ['email']),
   sites: defineTable({
