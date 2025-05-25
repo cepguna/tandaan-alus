@@ -5,8 +5,8 @@
 @layer base {
   :host,
   :root {
-    --popover: oklch(1 0 0) !important;
-    --popover-foreground: oklch(0.129 0.042 264.695) !important;
+    /* --popover: oklch(1 0 0) !important; */
+    /* --popover-foreground: oklch(0.129 0.042 264.695) !important; */
     --background: 0 0% 100%;
     --foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
@@ -28,8 +28,8 @@
   }
 
   .dark {
-    --popover: oklch(0.208 0.042 265.755) !important;
-    --popover-foreground: oklch(0.984 0.003 247.858) !important;
+    /* --popover: oklch(0.208 0.042 265.755) !important; */
+    /* --popover-foreground: oklch(0.984 0.003 247.858) !important; */
     --background: 224 71% 4%;
     --foreground: 213 31% 91%;
     --muted: 223 47% 11%;
