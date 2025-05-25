@@ -67,7 +67,7 @@ export const BookmarkSiteCard = ({ data, bookmarkCount, isLoading, hideAddTags }
               </Badge>
             )}
             <h3 className="text-base font-semibold tracking-tight">{data.title ?? '-'}</h3>
-            <p className={cn('text-sm opacity-50 tracking-tight', data.tags || !hideAddTags ? 'mb-4' : '')}>
+            <p className={cn('text-sm opacity-50 tracking-tight', data.tags?.length || !hideAddTags ? 'mb-4' : '')}>
               {data.link ?? '-'}
             </p>
             <div className="flex items-center flex-wrap gap-1">

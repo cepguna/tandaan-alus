@@ -108,7 +108,7 @@ export function ProfileSection() {
         isPrivate: dataSubmit.isPrivate === 'true' ? true : false,
         urls: dataSubmit.urls,
       };
-      const res = await mutateAsync({ ...newData, id: data?._id as Id<'users'> });
+      await mutateAsync({ ...newData, id: data?._id as Id<'users'> });
       toast.success(`Update success`);
       setIsEdit(false);
     } catch (err: any) {
@@ -123,7 +123,7 @@ export function ProfileSection() {
         username: data.username,
         email: data.email,
         bio: data?.bio ?? '',
-        urls: data?.urls ?? [{ type: '', link: '' }],
+        urls: data?.urls ?? [],
         isPrivate: data.isPrivate ? 'true' : 'false',
       });
     }
@@ -280,7 +280,7 @@ export function ProfileSection() {
         <div className="space-y-3">
           <FormLabel className="block">Social Media</FormLabel>
           {fields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-3">
+            <div key={field.id} className="flex items-start gap-3">
               <FormField
                 control={form.control}
                 disabled={!isEdit}
@@ -368,6 +368,7 @@ export function ProfileSection() {
               )}
             </div>
           ))}
+          {!isEdit && !data?.urls?.length && <p className="font-bold">No social media</p>}
           {isEdit && form.watch('urls').length <= 4 ? (
             <Button
               type="button"

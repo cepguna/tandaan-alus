@@ -39,7 +39,7 @@ export const LegendaryUserCard = ({ isLoading, data }: Props) => {
             </div>
             {data.bookmarkCount && (
               <Badge variant={'outline'}>
-                <Bookmark size={12} className="mr-2" /> Total {data.bookmarkCount}
+                <Bookmark size={12} className="mr-2" /> Total - {data.bookmarkCount}
               </Badge>
             )}
           </div>
