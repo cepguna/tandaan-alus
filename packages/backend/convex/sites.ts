@@ -1,6 +1,7 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
+import { Doc, Id } from './_generated/dataModel';
 
 export const addSites = mutation({
   args: {
@@ -182,10 +183,8 @@ export const getSitesById = query({
 export const updateSites = mutation({
   args: {
     id: v.id('sites'),
-    title: v.string(),
     description: v.optional(v.string()),
-    link: v.string(),
-    isPrivate: v.boolean(),
+    isPrivate: v.optional(v.boolean()),
     tags: v.array(v.string()),
   },
   handler: async (ctx, args) => {
@@ -196,9 +195,7 @@ export const updateSites = mutation({
 
     // Update sites table
     await ctx.db.patch(args.id, {
-      title: args.title,
       description: args.description,
-      link: args.link,
     });
 
     // Update isPrivate and tags in siteUsers table
@@ -209,13 +206,17 @@ export const updateSites = mutation({
       .first();
 
     if (siteUser) {
-      await ctx.db.patch(siteUser._id, { isPrivate: args.isPrivate, tags: args.tags });
+      if (args.isPrivate) {
+        await ctx.db.patch(siteUser._id, { isPrivate: args.isPrivate, tags: args.tags });
+      } else {
+        await ctx.db.patch(siteUser._id, { tags: args.tags });
+      }
     } else {
       // If no siteUser record exists, create one
       await ctx.db.insert('siteUsers', {
         userId,
         siteId: args.id,
-        isPrivate: args.isPrivate,
+        isPrivate: args.isPrivate ?? false,
         tags: args.tags,
       });
     }
@@ -320,6 +321,7 @@ export const getTopUsersByPublicBookmarks = query({
       .query('siteUsers')
       .filter(q => q.eq(q.field('isPrivate'), false))
       .collect();
+
     const userCounts = xuserCounts.reduce(
       (acc, siteUser) => {
         const userId = siteUser.userId;
@@ -329,14 +331,17 @@ export const getTopUsersByPublicBookmarks = query({
       {} as Record<string, number>,
     );
 
-    // Convert to array and sort by bookmark count
+    // Get users with usernames and their counts
     const sortedUsers = await Promise.all(
       Object.entries(userCounts)
         .sort(([, countA], [, countB]) => countB - countA) // Sort descending by count
         .slice(0, limit) // Take top N results
-        .map(async ([userId]) => {
-          const user = await ctx.db.get(userId as any);
-          if (!user) return null;
+        .map(async ([userId, bookmarkCount]) => {
+          const user = await ctx.db.get(userId as Id<'users'>);
+          // Skip users without a valid username
+          if (!user || !user.username || user.username.trim() === '') {
+            return null;
+          }
 
           // Get all unique tags from user's public bookmarks
           const tags = await ctx.db
@@ -348,17 +353,17 @@ export const getTopUsersByPublicBookmarks = query({
 
           return {
             userId,
-            bookmarkCount: userCounts[userId],
+            bookmarkCount,
             tags,
-            // Include minimal user details (adjust based on your users table schema)
             name: user.name || 'Anonymous',
             email: user.email || '',
+            username: user.username,
           };
         }),
     );
 
-    // Filter out any null results and return
-    return sortedUsers.filter(user => user !== null);
+    // Filter out any null results
+    return sortedUsers.filter((user): user is NonNullable<typeof user> => user !== null);
   },
 });
 
@@ -398,5 +403,77 @@ export const getPublicSitesByUserId = query({
         name: user.name ?? 'Anonymous',
       },
     };
+  },
+});
+
+export const getPublicSitesByUsername = query({
+  args: {
+    username: v.string(), // Required username to fetch public sites for
+  },
+  handler: async (ctx, args) => {
+    // Validate username input
+    if (!args.username || args.username.trim() === '' || args.username.length <= 2) {
+      return {
+        sites: [],
+        user: null,
+        error: 'Username is required',
+      };
+    }
+
+    try {
+      // Find user by username (case-insensitive)
+      const users = await ctx.db
+        .query('users')
+        .filter(q => q.eq(q.field('username'), args.username.toLowerCase()))
+        .take(1); // Take the first matching user
+      const user = users[0];
+
+      if (!user) {
+        return {
+          sites: [],
+          user: null,
+          error: `User with username "${args.username}" not found`,
+        };
+      }
+
+      // Get public siteUsers entries for the user
+      const siteUsers = await ctx.db
+        .query('siteUsers')
+        .filter(q => q.eq(q.field('userId'), user._id))
+        .filter(q => q.eq(q.field('isPrivate'), false))
+        .collect();
+
+      // Fetch site details for each public siteUser entry
+      const sites = await Promise.all(
+        siteUsers.map(async siteUser => {
+          const site = await ctx.db.get(siteUser.siteId);
+          if (!site) return null;
+          return {
+            ...site,
+            isPrivate: siteUser.isPrivate,
+            tags: siteUser.tags ?? [],
+          };
+        }),
+      );
+
+      // Filter out null results and return
+      return {
+        sites: sites.filter((site): site is NonNullable<typeof site> => site !== null),
+        user: {
+          userId: user._id,
+          username: user.username,
+          name: user.name ?? 'Anonymous',
+          email: user.email ?? '', // Include only if needed
+        },
+        error: null,
+      };
+    } catch (error) {
+      console.error('Error fetching public sites by username:', error);
+      return {
+        sites: [],
+        user: null,
+        error: 'An error occurred while fetching data',
+      };
+    }
   },
 });
