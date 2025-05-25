@@ -16,6 +16,7 @@ console.log('@extension/ui', CONVEX_URL);
 console.log('process.meta.env', import.meta.env.VITE_CONVEX_URL);
 console.log('allEnv', import.meta.env);
 console.log('convexUrl', convexUrl);
+console.log('process.env', process.env);
 const convex = new ConvexReactClient(convexUrl as string);
 
 const convexQueryClient = new ConvexQueryClient(convex);
