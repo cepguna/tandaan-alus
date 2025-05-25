@@ -11,8 +11,8 @@ import { ModalAlertProvider } from './contexts/modal-alert-context';
 import { Toaster } from './components/ui/sonner';
 import RootRouter from './routes/root';
 import { HelmetProvider } from 'react-helmet-async';
-
-const convex = new ConvexReactClient(CONVEX_URL as string);
+const convexUrl = import.meta.env.VITE_CONVEX_URL ?? CONVEX_URL;
+const convex = new ConvexReactClient(convexUrl as string);
 
 const convexQueryClient = new ConvexQueryClient(convex);
 const queryClient = new QueryClient({
