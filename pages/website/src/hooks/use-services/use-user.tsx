@@ -1,6 +1,6 @@
-import { convexQuery } from '@convex-dev/react-query';
+import { convexQuery, useConvexMutation } from '@convex-dev/react-query';
 import { api } from '@extension/backend/convex/_generated/api';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const useGetMe = () => {
   const query = useQuery(convexQuery(api.user.me, {}));
@@ -8,18 +8,9 @@ export const useGetMe = () => {
   return query;
 };
 
-// export const useLogout = () => {
-//   const { setMe } = useUserStore();
-//   const router = useRouter();
-//   const handleLogout = () => {
-//     setMe({
-//       name: '',
-//       email: '',
-//       role: 'user',
-//       _id: null as any,
-//       _creationTime: null as any,
-//     });
-//     router.replace('/login');
-//   };
-//   return handleLogout;
-// };
+export const useUpdateUser = () => {
+  const result = useMutation({
+    mutationFn: useConvexMutation(api.user.updateUser),
+  });
+  return result;
+};
