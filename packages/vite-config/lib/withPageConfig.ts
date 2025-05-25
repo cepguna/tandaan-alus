@@ -38,3 +38,24 @@ export const withPageConfig = (config: UserConfig) =>
       config,
     ),
   );
+
+export const withPageConfigWebsite = (config: UserConfig) =>
+  defineConfig(
+    deepmerge(
+      {
+        base: '',
+        plugins: [react(), IS_DEV && watchRebuildPlugin({ refresh: true })],
+        build: {
+          sourcemap: IS_DEV,
+          minify: IS_PROD,
+          reportCompressedSize: IS_PROD,
+          emptyOutDir: IS_PROD,
+          watch: watchOption,
+          rollupOptions: {
+            external: ['chrome'],
+          },
+        },
+      },
+      config,
+    ),
+  );

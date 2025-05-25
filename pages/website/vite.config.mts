@@ -1,10 +1,10 @@
 import { resolve } from 'node:path';
-import { withPageConfig } from '@extension/vite-config';
+import { withPageConfigWebsite } from '@extension/vite-config';
 
 const rootDir = resolve(import.meta.dirname);
 const srcDir = resolve(rootDir, 'src');
 
-export default withPageConfig({
+export default withPageConfigWebsite({
   resolve: {
     alias: {
       '@src': srcDir,
