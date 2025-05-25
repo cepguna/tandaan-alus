@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": ["CEB_*", "CLI_CEB_*"],
+  "globalEnv": ["CEB_*", "CLI_CEB_*", "VITE_*"],
   "globalDependencies": [".env"],
   "daemon": false,
   "tasks": {
@@ -19,7 +19,8 @@
     "build": {
       "dependsOn": ["ready", "^build"],
       "outputs": ["../../dist/**", "dist/**"],
-      "cache": false
+      "cache": false,
+      "env": ["VITE_CONVEX_URL", "VITE_TEST_ENV"]
     },
     "e2e": {
       "cache": false
