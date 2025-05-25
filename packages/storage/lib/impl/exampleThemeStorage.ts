@@ -21,3 +21,33 @@ export const exampleThemeStorage: ThemeStorage = {
     });
   },
 };
+
+const token = createStorage<string>('__convexAuthJWT_httpskeenpika344convexcloud', '', {
+  storageEnum: StorageEnum.Local,
+  liveUpdate: true,
+});
+
+// You can extend it with your own methods
+export const tokenStorage: BaseStorage<string> = {
+  ...token,
+};
+
+const refreshToken = createStorage<string>('__convexAuthRefreshToken_httpskeenpika344convexcloud', '', {
+  storageEnum: StorageEnum.Local,
+  liveUpdate: true,
+});
+
+// You can extend it with your own methods
+export const refreshTokenStorage: BaseStorage<string> = {
+  ...refreshToken,
+};
+
+const fontFamily = createStorage<string>('vite-ui-theme:fontFamily', '', {
+  storageEnum: StorageEnum.Local,
+  liveUpdate: true,
+});
+
+// You can extend it with your own methods
+export const fontFamilyStorage: BaseStorage<string> = {
+  ...fontFamily,
+};
