@@ -1,9 +1,10 @@
 // content.js
 import { sampleFunction } from '@src/sampleFunction';
+import { WEB_URL } from '@extension/env';
 
 console.log('[Extension] Content script loaded on:', window.location.href);
 
-const validOrigins = [window.location.origin]; // or hardcoded: ['http://localhost:3000']
+const validOrigins = [WEB_URL ?? 'http://localhost:3000']; // or hardcoded: ['http://localhost:3000']
 
 // Handshake to client
 window.postMessage({ type: 'REQUEST_WEBSITE_STORAGE' }, '*');

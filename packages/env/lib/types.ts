@@ -5,6 +5,7 @@ interface ICebEnv {
   readonly CEB_CONVEX_URL: string;
   readonly CEB_CONVEX_DEPLOYMENT: string;
   readonly CEB_DEV_LOCALE: string;
+  readonly CEB_WEB_URL: string;
 }
 
 interface ICebCliEnv {

@@ -5,8 +5,7 @@ import type { ILayout } from '@src/types';
 
 export const PUBLIC_ROUTES: ILayout[] = [
   {
-    title: 'Landing Page',
-    exact: true,
+    title: 'Discover & Share Great Websites',
     path: URL.HOME,
     component: LandingPage,
     layout: 'none',

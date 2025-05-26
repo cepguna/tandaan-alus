@@ -1,7 +1,7 @@
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage, refreshTokenStorage, tokenStorage } from '@extension/storage';
-import { t } from '@extension/i18n';
-import { ToggleButton } from '@extension/ui';
+import { WEB_URL } from '@extension/env';
+import { Button, ToggleButton } from '@extension/ui';
 import { Login } from './Login';
 import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
 import { User } from './User';
@@ -16,7 +16,7 @@ const Popup = () => {
   const refreshToken = useStorage(refreshTokenStorage);
   const isLight = theme === 'light';
 
-  const goToWebsite = () => chrome.tabs.create({ url: 'http://localhost:3000' });
+  const goToWebsite = () => chrome.tabs.create({ url: WEB_URL ?? 'http://localhost:3000' });
 
   useEffect(() => {
     console.log('token popup', token);
@@ -43,7 +43,26 @@ const Popup = () => {
         </div>
       </AuthLoading>
       <Unauthenticated>
-        <Login />
+        <p>Go to tandaan-alus.com and login</p>
+        <Button className="mt-5" onClick={goToWebsite}>
+          tandaan-alus.com
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            className="icon icon-tabler icons-tabler-outline icon-tabler-external-link">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
+            <path d="M11 13l9 -9" />
+            <path d="M15 4h5v5" />
+          </svg>
+        </Button>
       </Unauthenticated>
       <Authenticated>
         <User />

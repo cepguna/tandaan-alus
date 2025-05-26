@@ -3,6 +3,7 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '@extension/backend/convex/_generated/api';
 import { Badge, Button } from '@extension/ui';
 import type { Doc } from '@extension/backend/convex/_generated/dataModel';
+import { WEB_URL } from '@extension/env';
 
 export const User = () => {
   const user = useQuery(api.user.me);
@@ -97,7 +98,7 @@ export const User = () => {
     }
   }, [user, checkSiteByLink]);
 
-  const goToProfile = () => chrome.tabs.create({ url: 'http://localhost:3000/profile' });
+  const goToProfile = () => chrome.tabs.create({ url: WEB_URL ?? 'http://localhost:3000/profile' });
 
   useEffect(() => {
     checkSite();

@@ -11,4 +11,5 @@ export const dynamicEnvValues = {
   CEB_EXAMPLE: baseEnv.CEB_EXAMPLE,
   CEB_CONVEX_URL: baseEnv.CEB_CONVEX_URL,
   CEB_CONVEX_DEPLOYMENT: baseEnv.CEB_CONVEX_DEPLOYMENT,
+  CEB_WEB_URL: baseEnv.CEB_WEB_URL,
 } as const;
