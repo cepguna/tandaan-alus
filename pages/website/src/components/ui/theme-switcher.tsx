@@ -22,7 +22,12 @@ export const ThemeSwitcher = () => {
     if (metaThemeColor) metaThemeColor.setAttribute('content', themeColor);
   }, [theme]);
   return (
-    <Button onClick={handleToggle} size={'icon'} className="rounded-full" variant={'outline'}>
+    <Button
+      onClick={handleToggle}
+      size={'icon'}
+      className="rounded-full"
+      variant={'outline'}
+      aria-label="theme switcher">
       {theme === 'light' ? <Sun /> : <Moon />}
     </Button>
   );

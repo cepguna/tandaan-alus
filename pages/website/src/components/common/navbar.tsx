@@ -40,7 +40,7 @@ export const Navbar = () => {
       <nav className="fixed top-6 z-50 inset-x-4 h-16 bg-background border dark:border-slate-700/70 max-w-screen-xl mx-auto rounded-full">
         <div className="h-full flex items-center justify-between mx-auto px-4">
           <Authenticated>
-            <Link to={URL.DASHBOARD}>
+            <Link to={URL.DASHBOARD} aria-label="logo">
               <Logo />
             </Link>
           </Authenticated>
