@@ -65,9 +65,9 @@ const ExploreAllPage = () => {
 
   return (
     <div>
-      <div className="flex items-start justify-between gap-2 mb-6">
+      <div className="flex items-start justify-between flex-wrap gap-2 mb-6">
         <h2 className="text-2xl font-bold">Explore Sites</h2>
-        <div className="flex items-start gap-2">
+        <div className="flex items-start flex-wrap gap-2">
           <FilterSearch value={filter.search} onChange={value => setFilter(prev => ({ ...prev, search: value }))} />
           <FilterTags value={filter.tags} onChange={value => setFilter(prev => ({ ...prev, tags: value }))} />
           <FilterSortBy value={filter.sortBy} onChange={value => setFilter(prev => ({ ...prev, sortBy: value }))} />

@@ -11,7 +11,7 @@ export const MostBookmarkedSite = () => {
   if (isPending) {
     return (
       <div>
-        <div className="flex items-center justify-between gap-2  mb-6">
+        <div className="flex items-center justify-between flex-wrap gap-2  mb-6">
           <h2 className="text-2xl font-bold">Most Bookmarked Sites</h2>
           <Skeleton className="w-24 h-7" />
         </div>
@@ -25,7 +25,7 @@ export const MostBookmarkedSite = () => {
   }
   return (
     <div>
-      <div className="flex items-center justify-between gap-2  mb-6">
+      <div className="flex items-center justify-between flex-wrap gap-2  mb-6">
         <h2 className="text-2xl font-bold">Most Bookmarked Sites</h2>
         <Link to={`${URL.EXPLORE_ALL}?sortBy=most_bookmarked`}>
           <Button variant={'outline'} size={'sm'}>
