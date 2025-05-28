@@ -1,7 +1,7 @@
 import { Footer } from '../common/footer';
 import { Navbar } from '../common/navbar';
-import { Link, Outlet } from 'react-router-dom';
-import { Fragment } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Fragment, useLayoutEffect } from 'react';
 import { Slash } from 'lucide-react';
 import {
   Breadcrumb,
@@ -14,6 +14,11 @@ import {
 import { useBreadcrumbs } from '@src/hooks/use-breadcrumbs';
 
 export const MainLayout = () => {
+  const location = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, [location.pathname]);
   return (
     <>
       <Navbar />

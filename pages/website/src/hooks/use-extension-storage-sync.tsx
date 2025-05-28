@@ -21,7 +21,7 @@ export const useExtensionStorageSync = () => {
       }
 
       window.postMessage({ type: 'SYNC_LOCALSTORAGE', payload: localStorageData } as SyncMessage, targetOrigin);
-      console.log('[Client] Sent localStorage to extension:', localStorageData);
+      // console.log('[Client] Sent localStorage to extension:', localStorageData);
     } catch (error) {
       console.error('[Client] Failed to send localStorage to extension:', error);
     }
@@ -35,11 +35,11 @@ export const useExtensionStorageSync = () => {
         Object.entries(event.data.data).forEach(([key, value]) => {
           localStorage.setItem(key, value);
         });
-        console.log('[Client] Updated localStorage from extension:', event.data.data);
+        // console.log('[Client] Updated localStorage from extension:', event.data.data);
       }
 
       if (event.data.type === 'REQUEST_WEBSITE_STORAGE') {
-        console.log('[Client] Received request to send localStorage');
+        // console.log('[Client] Received request to send localStorage');
         syncToExtension(); // Respond to handshake
       }
     } catch (error) {

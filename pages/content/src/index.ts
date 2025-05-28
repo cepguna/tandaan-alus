@@ -2,7 +2,7 @@
 import { sampleFunction } from '@src/sampleFunction';
 import { WEB_URL } from '@extension/env';
 
-console.log('[Extension] Content script loaded on:', window.location.href);
+// console.log('[Extension] Content script loaded on:', window.location.href);
 
 const validOrigins = [WEB_URL ?? 'http://localhost:3000']; // or hardcoded: ['http://localhost:3000']
 
@@ -15,7 +15,7 @@ window.addEventListener('message', event => {
     if (!validOrigins.includes(event.origin)) return;
 
     if (event.data.type === 'SYNC_LOCALSTORAGE') {
-      console.log('[Extension] Received SYNC_LOCALSTORAGE', event.data.payload);
+      // console.log('[Extension] Received SYNC_LOCALSTORAGE', event.data.payload);
       chrome.runtime.sendMessage(
         {
           type: 'UPDATE_EXTENSION_STORAGE',
@@ -23,7 +23,7 @@ window.addEventListener('message', event => {
         },
         response => {
           try {
-            console.log('[Extension] Background response:', response);
+            // console.log('[Extension] Background response:', response);
             if (chrome.runtime.lastError) {
               console.error('[Extension] Runtime error:', chrome.runtime.lastError.message);
             }
@@ -43,7 +43,7 @@ window.addEventListener('message', event => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   try {
-    console.log('[Extension] Received runtime message:', message);
+    // console.log('[Extension] Received runtime message:', message);
     if (message.type === 'REQUEST_WEBSITE_STORAGE') {
       const data: Record<string, string> = {};
       for (let i = 0; i < localStorage.length; i++) {

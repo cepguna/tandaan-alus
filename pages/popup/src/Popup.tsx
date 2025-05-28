@@ -2,15 +2,11 @@ import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage, refreshTokenStorage, tokenStorage } from '@extension/storage';
 import { WEB_URL } from '@extension/env';
 import { Button, ToggleButton } from '@extension/ui';
-import { Login } from './Login';
 import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
 import { User } from './User';
 import { useEffect } from 'react';
-import { useAuthToken } from '@convex-dev/auth/react';
 
 const Popup = () => {
-  const x = useAuthToken();
-  console.log(x);
   const theme = useStorage(exampleThemeStorage);
   const token = useStorage(tokenStorage);
   const refreshToken = useStorage(refreshTokenStorage);
@@ -19,9 +15,9 @@ const Popup = () => {
   const goToWebsite = () => chrome.tabs.create({ url: WEB_URL ?? 'http://localhost:3000' });
 
   useEffect(() => {
-    console.log('token popup', token);
-    console.log('theme popup', theme);
-    console.log('refreshToken popup', refreshToken);
+    // console.log('token popup', token);
+    // console.log('theme popup', theme);
+    // console.log('refreshToken popup', refreshToken);
     if (token) {
       localStorage.setItem('__convexAuthJWT_httpskeenpika344convexcloud', token);
     } else {

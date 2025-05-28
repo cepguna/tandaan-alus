@@ -424,6 +424,7 @@ export const getPublicSitesByUsername = query({
           username: user.username,
           name: user.name ?? 'Anonymous',
           email: user.email ?? '',
+          urls: user.urls ?? [],
         },
         error: null,
       };

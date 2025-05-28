@@ -44,7 +44,6 @@ export function OtpForm({ email, onSuccess }: Props) {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
     setIsLoading(true);
     try {
       await signIn('resend-otp', { code: data.code, email, flow: 'signIn' });

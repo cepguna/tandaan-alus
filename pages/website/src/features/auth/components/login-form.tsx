@@ -37,7 +37,6 @@ export function LoginForm({ className, onClose, showOtp, ...props }: UserAuthFor
     console.log(data);
     try {
       const res = await signIn('resend-otp', { email: data.email });
-      console.log('login res', res);
       if (res.signingIn) {
         toast.success(`Welcome to Tandaan Alus`);
         onClose();
