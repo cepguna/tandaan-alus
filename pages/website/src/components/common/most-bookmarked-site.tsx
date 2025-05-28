@@ -27,7 +27,7 @@ export const MostBookmarkedSite = () => {
     <div>
       <div className="flex items-center justify-between gap-2  mb-6">
         <h2 className="text-2xl font-bold">Most Bookmarked Sites</h2>
-        <Link to={URL.EXPLORE_ALL}>
+        <Link to={`${URL.EXPLORE_ALL}?sortBy=most_bookmarked`}>
           <Button variant={'outline'} size={'sm'}>
             See More <ChevronRight />
           </Button>

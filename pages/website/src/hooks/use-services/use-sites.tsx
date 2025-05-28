@@ -13,8 +13,14 @@ export const useGetMostBookmarkedSites = (limit: number) => {
   return result;
 };
 
-export const useGetLatestPublicSites = (limit: number) => {
-  const result = useQuery(convexQuery(api.sites.getLatestPublicSites, { limit }));
+type IFilterPublicSites = {
+  search?: string;
+  tags?: string[];
+  sortBy?: 'most_bookmarked' | 'latest' | 'longest' | 'name_asc' | 'name_desc';
+};
+
+export const useGetLatestPublicSites = (limit: number, filter?: IFilterPublicSites) => {
+  const result = useQuery(convexQuery(api.sites.getLatestPublicSites, { limit, ...filter }));
   return result;
 };
 

@@ -321,35 +321,68 @@ export const getMostBookmarkedPublicSites = query({
 export const getLatestPublicSites = query({
   args: {
     limit: v.optional(v.number()),
+    sortBy: v.optional(
+      v.union(
+        v.literal('most_bookmarked'),
+        v.literal('latest'),
+        v.literal('longest'),
+        v.literal('name_asc'),
+        v.literal('name_desc'),
+      ),
+    ),
+    search: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const limit = args.limit ?? 10;
 
-    // Get all public siteUsers
-    const publicSiteUsers = await ctx.db
+    let siteUsers = await ctx.db
       .query('siteUsers')
       .filter(q => q.eq(q.field('isPrivate'), false))
       .collect();
 
-    // Sort by creation time descending (latest first)
-    const sortedPublicSiteUsers = publicSiteUsers.sort((a, b) => (b._creationTime ?? 0) - (a._creationTime ?? 0));
-
-    // Deduplicate sites by siteId to avoid duplicates
-    const uniqueSiteUserMap = new Map<string, (typeof publicSiteUsers)[number]>();
-
-    for (const su of sortedPublicSiteUsers) {
-      if (!uniqueSiteUserMap.has(su.siteId)) {
-        uniqueSiteUserMap.set(su.siteId, su);
-      }
-      if (uniqueSiteUserMap.size >= limit) break;
+    // Search by title or link (from 'sites' table)
+    if (args.search) {
+      const search = args.search.toLowerCase();
+      const siteIds = new Set(siteUsers.map(su => su.siteId));
+      const matchingSites = await Promise.all(
+        Array.from(siteIds).map(async id => {
+          const site = await ctx.db.get(id as Id<'sites'>);
+          if (!site) return null;
+          const match = site.title.toLowerCase().includes(search) || site.link.toLowerCase().includes(search);
+          return match ? site._id : null;
+        }),
+      );
+      const matchedIds = new Set(matchingSites.filter(Boolean) as Id<'sites'>[]);
+      siteUsers = siteUsers.filter(su => matchedIds.has(su.siteId));
     }
 
-    const uniqueSiteUsers = Array.from(uniqueSiteUserMap.values());
+    // Filter by tags (must contain at least one of them)
+    if (args.tags && args.tags.length > 0) {
+      siteUsers = siteUsers.filter(su => su.tags?.some(tag => args.tags!.includes(tag)));
+    }
 
-    const results = await Promise.all(
+    // Deduplicate siteUsers by siteId
+    const siteUserMap = new Map<string, (typeof siteUsers)[number]>();
+    for (const su of siteUsers) {
+      if (!siteUserMap.has(su.siteId)) {
+        siteUserMap.set(su.siteId, su);
+      }
+    }
+
+    const uniqueSiteUsers = Array.from(siteUserMap.values());
+
+    // Get related sites and sort later
+    const sitesWithMeta = await Promise.all(
       uniqueSiteUsers.map(async su => {
         const site = await ctx.db.get(su.siteId as Id<'sites'>);
         if (!site) return null;
+
+        const allSiteUsers = await ctx.db
+          .query('siteUsers')
+          .filter(q => q.eq(q.field('siteId'), su.siteId))
+          .filter(q => q.eq(q.field('isPrivate'), false))
+          .collect();
 
         return {
           ...site,
@@ -357,11 +390,37 @@ export const getLatestPublicSites = query({
           tags: su.tags ?? [],
           isPrivate: false,
           createdBy: su.userId,
+          bookmarkCount: allSiteUsers.length,
+          createdTime: su._creationTime ?? 0,
         };
       }),
     );
 
-    return results.filter((site): site is NonNullable<typeof site> => site !== null);
+    let results = sitesWithMeta.filter((site): site is NonNullable<typeof site> => site !== null);
+
+    // Sort logic
+    switch (args.sortBy) {
+      case 'most_bookmarked':
+        results = results.sort((a, b) => b.bookmarkCount - a.bookmarkCount);
+        break;
+      case 'latest':
+        results = results.sort((a, b) => b.createdTime - a.createdTime);
+        break;
+      case 'longest':
+        results = results.sort((a, b) => a.createdTime - b.createdTime);
+        break;
+      case 'name_asc':
+        results = results.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case 'name_desc':
+        results = results.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+      default:
+        // fallback to latest
+        results = results.sort((a, b) => b.createdTime - a.createdTime);
+    }
+
+    return results.slice(0, limit);
   },
 });
 
