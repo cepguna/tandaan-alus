@@ -12,10 +12,7 @@ window.postMessage({ type: 'REQUEST_WEBSITE_STORAGE' }, '*');
 window.addEventListener('message', event => {
   try {
     if (event.source !== window) return;
-    if (!validOrigins.includes(event.origin)) {
-      console.warn('[Extension] Invalid origin:', event.origin);
-      return;
-    }
+    if (!validOrigins.includes(event.origin)) return;
 
     if (event.data.type === 'SYNC_LOCALSTORAGE') {
       console.log('[Extension] Received SYNC_LOCALSTORAGE', event.data.payload);

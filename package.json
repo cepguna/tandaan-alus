@@ -1,13 +1,13 @@
 {
-  "name": "chrome-extension-boilerplate-react-vite",
+  "name": "tandaan-alus",
   "version": "0.4.3",
-  "description": "chrome extension boilerplate",
+  "description": "Tandaan Alus",
   "license": "MIT",
   "private": true,
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite.git"
+    "url": "https://github.com/cepguna/tandaan-alus"
   },
   "type": "module",
   "scripts": {
