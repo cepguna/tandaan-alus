@@ -3,20 +3,22 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '@extension/backend/convex/_generated/api';
 import type { Id } from '@extension/backend/convex/_generated/dataModel';
 
-export const useGetAllMySites = () => {
-  const result = useQuery(convexQuery(api.sites.getAllMySites, {}));
+type IFilterPublicSites = {
+  search?: string;
+  tags?: string[];
+  sortBy?: 'most_bookmarked' | 'latest' | 'longest' | 'name_asc' | 'name_desc';
+  pageSize?: number;
+  cursor?: number;
+};
+
+export const useGetAllMySites = (filter?: IFilterPublicSites) => {
+  const result = useQuery(convexQuery(api.sites.getAllMySites, { ...filter }));
   return result;
 };
 
 export const useGetMostBookmarkedSites = (limit: number) => {
   const result = useQuery(convexQuery(api.sites.getMostBookmarkedPublicSites, { limit }));
   return result;
-};
-
-type IFilterPublicSites = {
-  search?: string;
-  tags?: string[];
-  sortBy?: 'most_bookmarked' | 'latest' | 'longest' | 'name_asc' | 'name_desc';
 };
 
 export const useGetLatestPublicSites = (limit: number, filter?: IFilterPublicSites) => {
@@ -34,8 +36,8 @@ export const useGetPublicSitesByUserId = (userId: Id<'users'>) => {
   return result;
 };
 
-export const useGetPublicSitesByUsername = (username: string) => {
-  const result = useQuery(convexQuery(api.sites.getPublicSitesByUsername, { username }));
+export const useGetPublicSitesByUsername = (username: string, filter?: IFilterPublicSites) => {
+  const result = useQuery(convexQuery(api.sites.getPublicSitesByUsername, { username, ...filter }));
   return result;
 };
 

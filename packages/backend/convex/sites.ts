@@ -55,30 +55,106 @@ export const addSites = mutation({
 });
 
 export const getAllMySites = query({
-  handler: async ctx => {
+  args: {
+    pageSize: v.optional(v.number()),
+    cursor: v.optional(v.number()), // Based on _creationTime
+    sortBy: v.optional(
+      v.union(
+        v.literal('most_bookmarked'),
+        v.literal('latest'),
+        v.literal('longest'),
+        v.literal('name_asc'),
+        v.literal('name_desc'),
+      ),
+    ),
+    search: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return [];
-    }
+    if (!userId) return { sites: [], nextCursor: null };
 
-    const siteUsers = await ctx.db
+    const pageSize = args.pageSize ?? 10;
+    const sortBy = args.sortBy ?? 'latest';
+
+    // Get all site-user links for the user
+    let siteUsers = await ctx.db
       .query('siteUsers')
       .filter(q => q.eq(q.field('userId'), userId))
       .collect();
 
-    const sites = await Promise.all(
-      siteUsers.map(async siteUser => {
-        const site = await ctx.db.get(siteUser.siteId);
+    // Filter by tags (optional)
+    if (args.tags?.length) {
+      siteUsers = siteUsers.filter(su => su.tags?.some(tag => args.tags!.includes(tag)));
+    }
+
+    // Get site data
+    let enrichedSites = await Promise.all(
+      siteUsers.map(async su => {
+        const site = await ctx.db.get(su.siteId);
         if (!site) return null;
+
+        if (args.search) {
+          const keyword = args.search.toLowerCase();
+          if (!site.title.toLowerCase().includes(keyword) && !site.link.toLowerCase().includes(keyword)) {
+            return null;
+          }
+        }
+
+        const bookmarkCount = await ctx.db
+          .query('siteUsers')
+          .filter(q => q.eq(q.field('siteId'), su.siteId))
+          .collect()
+          .then(list => list.length);
+
         return {
           ...site,
-          isPrivate: siteUser.isPrivate,
-          tags: siteUser.tags ?? [],
+          isPrivate: su.isPrivate,
+          tags: su.tags ?? [],
+          createdTime: su._creationTime ?? 0,
+          bookmarkCount,
         };
       }),
     );
 
-    return sites.filter((site): site is NonNullable<typeof site> => site !== null);
+    enrichedSites = enrichedSites.filter((site): site is NonNullable<typeof site> => site !== null);
+
+    // Sort logic
+    switch (sortBy) {
+      case 'most_bookmarked':
+        enrichedSites.sort((a, b) => b.bookmarkCount - a.bookmarkCount);
+        break;
+      case 'latest':
+        enrichedSites.sort((a, b) => b.createdTime - a.createdTime);
+        break;
+      case 'longest':
+        enrichedSites.sort((a, b) => a.createdTime - b.createdTime);
+        break;
+      case 'name_asc':
+        enrichedSites.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case 'name_desc':
+        enrichedSites.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+    }
+
+    // Pagination by createdTime
+    if (args.cursor) {
+      enrichedSites = enrichedSites.filter(site => {
+        if (sortBy === 'latest') return site.createdTime < args.cursor!;
+        if (sortBy === 'longest') return site.createdTime > args.cursor!;
+        return true;
+      });
+    }
+
+    const paginatedSites = enrichedSites.slice(0, pageSize);
+    const nextCursor =
+      paginatedSites.length === pageSize ? paginatedSites[paginatedSites.length - 1].createdTime : null;
+
+    return {
+      sites: paginatedSites,
+      nextCursor,
+    };
   },
 });
 
@@ -480,6 +556,19 @@ export const getTopUsersByPublicBookmarks = query({
 export const getPublicSitesByUsername = query({
   args: {
     username: v.string(),
+    pageSize: v.optional(v.number()),
+    cursor: v.optional(v.number()), // based on creation time
+    sortBy: v.optional(
+      v.union(
+        v.literal('most_bookmarked'),
+        v.literal('latest'),
+        v.literal('longest'),
+        v.literal('name_asc'),
+        v.literal('name_desc'),
+      ),
+    ),
+    search: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     if (!args.username || args.username.trim() === '' || args.username.length <= 2) {
@@ -487,8 +576,12 @@ export const getPublicSitesByUsername = query({
         sites: [],
         user: null,
         error: 'Valid username is required',
+        nextCursor: null,
       };
     }
+
+    const pageSize = args.pageSize ?? 10;
+    const sortBy = args.sortBy ?? 'latest';
 
     try {
       const users = await ctx.db
@@ -502,29 +595,87 @@ export const getPublicSitesByUsername = query({
           sites: [],
           user: null,
           error: `User with username "${args.username}" not found`,
+          nextCursor: null,
         };
       }
 
-      const siteUsers = await ctx.db
+      let siteUsers = await ctx.db
         .query('siteUsers')
         .filter(q => q.eq(q.field('userId'), user._id))
         .filter(q => q.eq(q.field('isPrivate'), false))
         .collect();
 
-      const sites = await Promise.all(
-        siteUsers.map(async siteUser => {
-          const site = await ctx.db.get(siteUser.siteId);
+      // Filter by tags
+      if (args.tags?.length) {
+        siteUsers = siteUsers.filter(su => su.tags?.some(tag => args.tags!.includes(tag)));
+      }
+
+      // Enrich with site data
+      let enrichedSites = await Promise.all(
+        siteUsers.map(async su => {
+          const site = await ctx.db.get(su.siteId);
           if (!site) return null;
+
+          if (args.search) {
+            const keyword = args.search.toLowerCase();
+            if (!site.title.toLowerCase().includes(keyword) && !site.link.toLowerCase().includes(keyword)) {
+              return null;
+            }
+          }
+
+          const bookmarkCount = await ctx.db
+            .query('siteUsers')
+            .filter(q => q.eq(q.field('siteId'), su.siteId))
+            .filter(q => q.eq(q.field('isPrivate'), false))
+            .collect()
+            .then(list => list.length);
+
           return {
             ...site,
-            isPrivate: siteUser.isPrivate,
-            tags: siteUser.tags ?? [],
+            tags: su.tags ?? [],
+            isPrivate: su.isPrivate,
+            createdTime: su._creationTime ?? 0,
+            bookmarkCount,
           };
         }),
       );
 
+      enrichedSites = enrichedSites.filter((site): site is NonNullable<typeof site> => site !== null);
+
+      // Sort
+      switch (sortBy) {
+        case 'most_bookmarked':
+          enrichedSites.sort((a, b) => b.bookmarkCount - a.bookmarkCount);
+          break;
+        case 'latest':
+          enrichedSites.sort((a, b) => b.createdTime - a.createdTime);
+          break;
+        case 'longest':
+          enrichedSites.sort((a, b) => a.createdTime - b.createdTime);
+          break;
+        case 'name_asc':
+          enrichedSites.sort((a, b) => a.title.localeCompare(b.title));
+          break;
+        case 'name_desc':
+          enrichedSites.sort((a, b) => b.title.localeCompare(a.title));
+          break;
+      }
+
+      // Apply cursor-based pagination (based on createdTime)
+      if (args.cursor) {
+        enrichedSites = enrichedSites.filter(site => {
+          if (sortBy === 'latest') return site.createdTime < args.cursor!;
+          if (sortBy === 'longest') return site.createdTime > args.cursor!;
+          return true;
+        });
+      }
+
+      const paginatedSites = enrichedSites.slice(0, pageSize);
+      const nextCursor =
+        paginatedSites.length === pageSize ? paginatedSites[paginatedSites.length - 1].createdTime : null;
+
       return {
-        sites: sites.filter((site): site is NonNullable<typeof site> => site !== null),
+        sites: paginatedSites,
         user: {
           userId: user._id,
           username: user.username,
@@ -533,6 +684,7 @@ export const getPublicSitesByUsername = query({
           urls: user.urls ?? [],
         },
         error: null,
+        nextCursor,
       };
     } catch (error) {
       console.error('Error fetching public sites by username:', error);
@@ -540,6 +692,7 @@ export const getPublicSitesByUsername = query({
         sites: [],
         user: null,
         error: 'An error occurred while fetching data',
+        nextCursor: null,
       };
     }
   },
