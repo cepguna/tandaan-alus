@@ -22,7 +22,7 @@ import {
 } from '@extension/ui';
 import { ThemeSwitcher } from '../ui/theme-switcher';
 import useModal from '@src/hooks/use-modal';
-import { Authenticated, Unauthenticated } from 'convex/react';
+import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
 import { LogOut, Menu, Palette, User } from 'lucide-react';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useModalAlert } from '@src/contexts/modal-alert-context';
@@ -49,6 +49,9 @@ export const Navbar = () => {
               <Logo />
             </Link>
           </Unauthenticated>
+          <AuthLoading>
+            <Logo />
+          </AuthLoading>
 
           {/* Desktop Menu */}
           <NavMenu className="hidden md:block" />

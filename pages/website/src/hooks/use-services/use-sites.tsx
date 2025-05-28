@@ -13,6 +13,11 @@ export const useGetMostBookmarkedSites = (limit: number) => {
   return result;
 };
 
+export const useGetLatestPublicSites = (limit: number) => {
+  const result = useQuery(convexQuery(api.sites.getLatestPublicSites, { limit }));
+  return result;
+};
+
 export const useGetTopUsersByPublicBookmarks = (limit: number) => {
   const result = useQuery(convexQuery(api.sites.getTopUsersByPublicBookmarks, { limit }));
   return result;

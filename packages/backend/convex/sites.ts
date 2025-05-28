@@ -1,7 +1,7 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
-import { Id } from './_generated/dataModel';
+import type { Id } from './_generated/dataModel';
 
 export const addSites = mutation({
   args: {
@@ -315,6 +315,53 @@ export const getMostBookmarkedPublicSites = query({
     );
 
     return sortedSites.filter((site): site is NonNullable<typeof site> => site !== null);
+  },
+});
+
+export const getLatestPublicSites = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = args.limit ?? 10;
+
+    // Get all public siteUsers
+    const publicSiteUsers = await ctx.db
+      .query('siteUsers')
+      .filter(q => q.eq(q.field('isPrivate'), false))
+      .collect();
+
+    // Sort by creation time descending (latest first)
+    const sortedPublicSiteUsers = publicSiteUsers.sort((a, b) => (b._creationTime ?? 0) - (a._creationTime ?? 0));
+
+    // Deduplicate sites by siteId to avoid duplicates
+    const uniqueSiteUserMap = new Map<string, (typeof publicSiteUsers)[number]>();
+
+    for (const su of sortedPublicSiteUsers) {
+      if (!uniqueSiteUserMap.has(su.siteId)) {
+        uniqueSiteUserMap.set(su.siteId, su);
+      }
+      if (uniqueSiteUserMap.size >= limit) break;
+    }
+
+    const uniqueSiteUsers = Array.from(uniqueSiteUserMap.values());
+
+    const results = await Promise.all(
+      uniqueSiteUsers.map(async su => {
+        const site = await ctx.db.get(su.siteId as Id<'sites'>);
+        if (!site) return null;
+
+        return {
+          ...site,
+          siteUserId: su._id,
+          tags: su.tags ?? [],
+          isPrivate: false,
+          createdBy: su.userId,
+        };
+      }),
+    );
+
+    return results.filter((site): site is NonNullable<typeof site> => site !== null);
   },
 });
 
