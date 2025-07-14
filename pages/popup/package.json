@@ -30,7 +30,7 @@
     "@extension/storage": "workspace:*",
     "@extension/ui": "workspace:*",
     "@tanstack/react-query": "^5.76.2",
-    "convex": "^1.13.0"
+    "convex": "^1.25.2"
   },
   "devDependencies": {
     "@extension/tailwindcss-config": "workspace:*",
